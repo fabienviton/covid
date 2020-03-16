@@ -52,7 +52,9 @@ def handle_categorical_data(df):
         print(dum_df.shape)
         print(dum_df.columns)
         # merge with main
-        df = df.join(dum_df)
+        # df = df.join(dum_df)
+        df = pd.concat([df, dum_df.reindex(df.index)], axis=1)
+        print(df.shape)
         df = df.drop(columns=[cat_data])
 
         print(df.shape)
