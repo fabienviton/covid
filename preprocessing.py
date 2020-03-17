@@ -21,7 +21,7 @@ def fill_missing_numerical_data(df):
 
 def get_normalizer_from_data(df):
     norm = {}
-    numerical_data = ["FC", "DOULEUR", "GLYCEMIE", "TEMPERATURE", "SATURATION", "OXYGENE", "CETONEMIE", "HEMOCUE", "OH", "BLADDER", "PAS", "PAD"]
+    numerical_data = ["FC", "DOULEUR", "GLYCEMIE", "TEMPERATURE", "SATURATION", "OXYGENE", "CETONEMIE", "HEMOCUE", "OH", "BLADDER", "PAS", "PAD", "AGE"]
     for col in df:
         if col in numerical_data:
             print(col)

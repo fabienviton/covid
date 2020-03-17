@@ -1,5 +1,6 @@
 import keras
 import numpy as np
+import pandas as pd
 from sklearn import metrics
 
 
@@ -43,12 +44,14 @@ def print_metrics_binary(y_true, predictions, verbose=1, keepPCR=False):
 
 
 class HospitalisationMetrics(keras.callbacks.Callback):
-    def __init__(self, train_data_x, train_data_y, val_data_x, val_data_y, batch_size=32, verbose=2):
+    def __init__(self, train_data_x, train_data_y, val_data_x, val_data_y, test_data_x, test_data_y, batch_size=32, verbose=2):
         super(HospitalisationMetrics, self).__init__()
         self.train_data_x = train_data_x
         self.train_data_y = train_data_y
         self.val_data_x = val_data_x
         self.val_data_y = val_data_y
+        self.test_data_x = test_data_x
+        self.test_data_y = test_data_y
         self.verbose = verbose
         self.batch_size = batch_size
         self.train_history = []
@@ -58,7 +61,6 @@ class HospitalisationMetrics(keras.callbacks.Callback):
         predictions = self.model.predict(data_x, batch_size=self.batch_size)
         y_true = data_y
 
-
         predictions = np.array(predictions)
         predictions_flat = np.reshape(predictions, (-1, 1))
         predictions_flat = np.stack([1 - predictions_flat, predictions_flat], axis=1)
@@ -66,9 +68,18 @@ class HospitalisationMetrics(keras.callbacks.Callback):
 
         ret = print_metrics_binary(y_true, predictions_flat, )
 
-    def on_epoch_end(self, epoch, logs={}):
-        print("\n==>predicting on train")
-        self.calc_metrics(self.train_data_x, self.train_data_y, self.train_history, 'train', logs)
-        print("\n==>predicting on validation")
-        self.calc_metrics(self.val_data_x, self.val_data_y, self.val_history, 'val', logs)
+        # Calcul avec le threeshold à 0.8:
+        print("threeshold 0.8")
+        predictions = np.array(predictions)
+        predictions = [1 if cur_pred > 0.8 else 0 for cur_pred in predictions]
+        # predictions = pd.get_dummies(predictions, sparse=True)
+        cf08 = metrics.confusion_matrix(y_true, predictions)
+        print(cf08)
 
+    def on_epoch_end(self, epoch, logs={}):
+        print("\n==>predicting on train retrospective Jan15-Dec18")
+        self.calc_metrics(self.train_data_x, self.train_data_y, self.train_history, 'train', logs)
+        print("\n==>predicting on valid retrospective Jan-Jun19")
+        self.calc_metrics(self.val_data_x, self.val_data_y, self.val_history, 'val', logs)
+        print("\n==>predicting on valid prospective Nov19")
+        self.calc_metrics(self.test_data_x, self.test_data_y, self.val_history, 'test', logs)

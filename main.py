@@ -14,14 +14,18 @@ from callbacks import HospitalisationMetrics
 # Import data. X a 25 columns, Y en a 5.
 train_data_x, train_data_y = load_data("C:/Users/Fabien/Documents/Covid", "ancien_data.csv")
 valid_data_x, valid_data_y = load_data("C:/Users/Fabien/Documents/Covid", "nouveau_data.csv")
+test_data_x, test_data_y = load_data("C:/Users/Fabien/Documents/Covid", "passages_2020-01-17.csv")
+
 
 # Preprocess data
 train_data_x = fill_missing_numerical_data(train_data_x)
 valid_data_x = fill_missing_numerical_data(valid_data_x)
+test_data_x = fill_missing_numerical_data(test_data_x)
 
 normalizer = get_normalizer_from_data(train_data_x)
 train_data_x = normalize_numerical_data(normalizer, train_data_x)
 valid_data_x = normalize_numerical_data(normalizer, valid_data_x)
+test_data_x = normalize_numerical_data(normalizer, test_data_x)
 
 
 #  Regroupement des populations de train et test avant de gérer le catégoriel (one hot encoding des valeurs).
@@ -29,13 +33,15 @@ valid_data_x = normalize_numerical_data(normalizer, valid_data_x)
 # Je fais sans categoriel pour le moment. TODO: A tester
 print("train_data_x.shape", train_data_x.shape)
 print("valid_data_x.shape", valid_data_x.shape)
+print("test_data_x.shape", test_data_x.shape)
 nb_train_data_x = train_data_x.shape[0]
 nb_valid_data_x = valid_data_x.shape[0]
-all_data_x = pd.concat([train_data_x, valid_data_x])
+all_data_x = pd.concat([train_data_x, valid_data_x, test_data_x])
 all_data_x = handle_categorical_data(all_data_x)
 print("all_data_x.shape", all_data_x.shape)
 train_data_x = all_data_x[:nb_train_data_x]
-valid_data_x = all_data_x[nb_train_data_x:]
+valid_data_x = all_data_x[nb_train_data_x:nb_train_data_x+nb_valid_data_x]
+test_data_x = all_data_x[nb_train_data_x+nb_valid_data_x:]
 
 # Suppression des données catégorielles dans X: 25 -> 16 colonnes.
 # categorical_data = ["CODE_ARRIVEE", "CODE_MOYEN", "SEXE", "ACCOMP", "ATTENTE", "CIRCONSTANCES", "FAMILLE", "CIMU",
@@ -49,6 +55,7 @@ valid_data_x = all_data_x[nb_train_data_x:]
 # Je ne considère que l'hospitalisation fiale en résultat: Y passe de 5 à une colonne.
 train_data_y = train_data_y['HOSPITALISATION']
 valid_data_y = valid_data_y['HOSPITALISATION']
+test_data_y = test_data_y['HOSPITALISATION']
 
 
 # Consrtuct model
@@ -63,11 +70,17 @@ model.compile(optimizer='Adam', loss='binary_crossentropy')
 hospit_metrics = HospitalisationMetrics(train_data_x=train_data_x,
                                         train_data_y=train_data_y,
                                         val_data_x=valid_data_x,
-                                        val_data_y=valid_data_y)
+                                        val_data_y=valid_data_y,
+                                        test_data_x=test_data_x,
+                                        test_data_y=test_data_y)
+
+# TODO: Faire un callback pour save le modele à chaque epoch afin de choisr le meilleur à la fin
 
 # train data
-model.fit(x=train_data_x, y=train_data_y, epochs=50, verbose=1, callbacks=[hospit_metrics])
+model.fit(x=train_data_x,
+          y=train_data_y,
+          epochs=50,
+          verbose=1,
+          # validation_data=(valid_data_x, valid_data_y),
+          callbacks=[hospit_metrics])
 
-
-# valid avec jeu réél
-# TODO
