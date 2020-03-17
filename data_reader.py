@@ -7,7 +7,32 @@ def load_data(data_dir, data_file):
     df = pd.read_csv(os.path.join(data_dir, data_file))
     y = df[["CODE_DEST", "SERVICE", "SPECIALITE", "DESTINATION", "HOSPITALISATION"]]
     # "MOTIFS_RECOURS"
-    x = df[["CODE_ARRIVEE", "CODE_MOYEN", "SEXE", "ACCOMP", "ATTENTE", "CIRCONSTANCES", "FAMILLE", "CIMU", "FC", "DOULEUR", "GLYCEMIE", "TEMPERATURE", "SATURATION", "OXYGENE", "CETONEMIE", "HEMOCUE", "OH", "BLADDER", "AGE", "JOUR_SEMAINE", "SEMAINE_ANNEE", "HEURE_ARRIVEE", "PAS", "PAD", "PREMIER_MOTIF"]]
+    # "JOUR_SEMAINE", "SEMAINE_ANNEE", "HEURE_ARRIVEE",
+    # ,
+    x = df[[
+            "CODE_ARRIVEE",
+            "CODE_MOYEN",
+            "SEXE",
+            "ACCOMP",
+            "ATTENTE",
+            "CIRCONSTANCES",
+            "FAMILLE",
+            "CIMU",
+            "PREMIER_MOTIF",
+            "FC",
+            "DOULEUR",
+            "GLYCEMIE",
+            "TEMPERATURE",
+            "SATURATION",
+            "OXYGENE",
+            "CETONEMIE",
+            "HEMOCUE",
+            "OH",
+            "BLADDER",
+            "AGE",
+            "PAS",
+            "PAD",
+            ]]
 
     # for col in x:
     #     print(col)

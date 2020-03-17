@@ -40,11 +40,25 @@ def normalize_numerical_data(normalizer, df):
 
 
 def handle_categorical_data(df):
-    # "MOTIFS_RECOURS" à gérer car constitué de liste.
+    # TODO: "MOTIFS_RECOURS" à gérer car constitué de liste.
     # Si "PREMIER_MOTIF", il amène 110 catégories ce qui pourrait pourrir le modèle ? A voir
-    categorical_data = ["CODE_ARRIVEE", "CODE_MOYEN", "SEXE", "ACCOMP", "ATTENTE", "CIRCONSTANCES", "FAMILLE", "CIMU", "PREMIER_MOTIF"] # "MOTIFS_RECOURS"
+    categorical_data = ["CODE_ARRIVEE",
+                        "CODE_MOYEN",
+                        "SEXE",
+                        "ACCOMP",
+                        "ATTENTE",
+                        "CIRCONSTANCES",
+                        "FAMILLE",
+                        "CIMU",
+                        "PREMIER_MOTIF"]
+                        # "JOUR_SEMAINE",
+                        # "SEMAINE_ANNEE",
+                        # "HEURE_ARRIVEE"]
+                        # "MOTIFS_RECOURS"
     for cat_data in categorical_data:
         print(cat_data)
+        if not (cat_data in df.columns):
+            continue
         cat_data_df = pd.DataFrame(df, columns=[cat_data])
 
         # generate binary values using get_dummies
